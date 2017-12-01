@@ -14,6 +14,10 @@ def index():
 def user(name):
     return render_template('user.html',user=name)
 
+@app.route('/user/')
+def users():
+    return render_template('user.html')
+
 
 
 if __name__ == "__main__":

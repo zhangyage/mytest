@@ -5,6 +5,10 @@
 <title>user</title>
 </head>
 <body>
-<h1>Hello {{user|capitalize}}</h1>
+{% if user %}
+	<h1>Hello {{user|capitalize}}</h1>
+{% else %}
+	<h1>Hello,Stronger!</h1>
+{% endif %}
 </body>
 </html>
