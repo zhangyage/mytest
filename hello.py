@@ -5,7 +5,7 @@
 flask-moment  学习使用moment同一时间，  对应的直接使用本地电脑的时间，不在从服务器中获取时间
 '''
 
-from flask import Flask,render_template
+from flask import Flask,render_template,session,url_for,redirect
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from datetime import datetime
@@ -29,9 +29,11 @@ def index():
     name = None
     form = NameForm()
     if form.validate_on_submit():
-        name = form.name.data
-        form.name.data=''
-    return render_template('index.html',form=form,name=name)
+        session['name'] = form.name.data
+        print session.get('name')
+        return redirect(url_for('index'))
+        
+    return render_template('index.html',form=form,name=session.get('name'))
 
 
 if __name__ == "__main__":
