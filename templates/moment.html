@@ -1,0 +1,25 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}" type="image/x-icon">
+{% endblock %}
+
+<!-- 导入moment.js文件，格式化本地时间显示 -->
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <p>The local date and time is {{ moment(current_time).format('LLL') }}.</p>
+	<p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
+</div>
+{% endblock %}
