@@ -1,41 +1,35 @@
-使用flask-wtf插件，处理表单
+学习使用flask扩展flask-sqlalchemy连接我们的数据库
+1、安装方法：
+	pip install flask-sqlalchemy
 
-知识点：
-1、跨站请求伪造
-app.config['SECRET_KEY']='hard to guess string'   #设置一个跨站请求伪造的key
-同时为了安全考虑密钥等一些配置选项不要直接写入代码，可以保存在我们系统的环境变量中调用
-form.hidden_tag() 模板参数将被替换为一个隐藏字段，用来是实现在配置中激活的 CSRF 保护。如果你已经激活了 CSRF，这个字段需要出现在你所有的表单中
+2、连接方式
+	在 Flask-SQLAlchemy 中，数据库使用 URL 指定
+	FLask-SQLAlchemy数据库URL
+	数据库引擎 URL
+	MySQL 			mysql://username:password@hostname/database
+	Postgres 		postgresql://username:password@hostname/database
+	SQLite（ Unix）	 sqlite:////absolute/path/to/database
+	SQLite（ Windows） sqlite:///c:/absolute/path/to/database
+	
+3、连接方法，注意
+	程序使用的数据库 URL 必须保存到 Flask 配置对象的 SQLALCHEMY_DATABASE_URI 键中。
+	配置对象中还有一个很有用的选项， 即 SQLALCHEMY_COMMIT_ON_TEARDOWN 键，将其设为 True时，每次请求结束后都会自动提交数据库中的变动。
+	
+4、在创建数据库时候，为了建立表与表之间的关系，我们需要使用外键，方法如下
+	class Role(db.Model):
+	# ...
+	users = db.relationship('User', backref='role')
+	class User(db.Model):
+	# ...
+	role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
-表单，flask的form表单支持的字段类型有：
-字段类型 			说　　明
-StringField 		文本字段
-TextAreaField 		多行文本字段
-PasswordField		密码文本字段
-HiddenField 		隐藏文本字段
-DateField 			文本字段，值为 datetime.date 格式
-DateTimeField 		文本字段，值为 datetime.datetime 格式
-IntegerField 		文本字段，值为整数
-DecimalField 		文本字段，值为 decimal.Decimal
-FloatField 		         文本字段，值为浮点数
-BooleanField 	         复选框，值为 True 和 False
-RadioField 		          一组单选框
-SelectField 		下拉列表
-SelectMultipleField 下拉列表，可选择多个值
-FileField 			文件上传字段
-SubmitField 		表单提交按钮
-FormField 			把表单作为字段嵌入另一个表单
-FieldList 			一组指定类型的字段
+5、生成数据库，
+	查看我们的代码。我们已经定义了两个表分别是，role和user，表之间我们换建立的关联关系，
+	我们创建表使用shell模式创建，这个时候我们需要使用的是，flask-script插件：
+	如下：
+	E:\workspace\Amytest>python hello.py shell
 
-除了表单中的字段类型为，我们还需要认真了解表单中的验证函数：如下：
-验证函数 			            说　　明
-Email			 	验证电子邮件地址
-EqualTo 			比较两个字段的值；常用于要求输入两次密码进行确认的情况
-IPAddress 			验证 IPv4 网络地址
-Length 				验证输入字符串的长度
-NumberRange 		验证输入的值在数字范围内
-Optional 			无输入值时跳过其他验证函数
-Required 			确保字段中有数据
-Regexp 				使用正则表达式验证输入值
-URL 				验证 URL
-AnyOf 				确保输入值在可选值列表中
-NoneOf 				确保输入值不在可选值列表中
+	>>> from hello import db
+	>>> db.create_all()
+	>>>
+	操作完成后，会发现我们的目录下多出一个文件
