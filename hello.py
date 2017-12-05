@@ -15,6 +15,7 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 import os
+from flask_script.commands import Shell
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -77,8 +78,12 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
-#manager = Manager(app)
+# manager = Manager(app)    #结合shell注册上下文
+# def make_shell_context():
+#     return dict(app=app,db=db,User=User,Role=Role)
+
 
 if __name__ == "__main__":
     app.run(debug=True,port=int("80"))
     #manager.run()    #使用这个方式启动，是为了在shel模式下简历我们的数据库表
+    #manager.add_command("shell",Shell(make_context=make_shell_context()))
