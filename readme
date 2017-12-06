@@ -1,12 +1,32 @@
-使用flask-mail插件，电子邮件插件
-	pip install flask-mail
-
-	
-Flask-Mail SMTP服务器的配置
-配置默认值说明
-MAIL_SERVER 	localhost 电子邮件服务器的主机名或 IP 地址
-MAIL_PORT 25	 电子邮件服务器的端口
-MAIL_USE_TLS 	False 启用传输层安全（ Transport Layer Security， TLS）协议
-MAIL_USE_SSL 	False 启用安全套接层（ Secure Sockets Layer， SSL）协议
-MAIL_USERNAME 	None 邮件账户的用户名
-MAIL_PASSWORD 	kdNone 邮件账户的密码
+项目实战
+搭建项目的框架
+多文件 Flask 程序的基本结构
+|-flasky
+|-app/
+|-templates/
+|-static/
+|-main/
+|-__init__.py
+|-errors.py
+|-forms.py
+|-views.py
+|-__init__.py
+|-email.py
+|-models.py
+|-migrations/
+|-tests/
+|-__init__.py66 ｜ 第 7 章
+|-test*.py
+|-venv/
+|-requirements.txt
+|-config.py
+|-manage.py
+这种结构有 4 个顶级文件夹：
+• Flask 程序一般都保存在名为 app 的包中；
+• 和之前一样， migrations 文件夹包含数据库迁移脚本；
+• 单元测试编写在 tests 包中；
+• 和之前一样， venv 文件夹包含 Python 虚拟环境。
+同时还创建了一些新文件：
+• requirements.txt 列出了所有依赖包，便于在其他电脑中重新生成相同的虚拟环境；
+• config.py 存储配置；
+• manage.py 用于启动程序以及其他的程序任务。
