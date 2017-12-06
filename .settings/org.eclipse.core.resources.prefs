@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//app/email.py=utf-8
 encoding//app/hello.py=utf-8
+encoding//app/models.py=utf-8
 encoding/config.py=utf-8
 encoding/manage.py=utf-8
