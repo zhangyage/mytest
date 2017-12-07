@@ -30,3 +30,48 @@
 • requirements.txt 列出了所有依赖包，便于在其他电脑中重新生成相同的虚拟环境；
 • config.py 存储配置；
 • manage.py 用于启动程序以及其他的程序任务。
+
+
+我们使用requirements.txt记录我们使用的一些程序开发中的依赖包和对应的版本号，这对我们是很有利的，
+我们可以在新的环境中通过如下的方式快速搭建我们的运行环境：
+方法一、pip freeze >requirements.txt
+方法二、pip install -r requirement.txt
+
+
+单元测试参考：
+	https://docs.python.org/2/library/unittest.html
+
+
+总结：
+1、	config文件，记录了我们的一些配置参数，一个应该学习的地方是，使用了类，可以把一下公用的参数制定为一类
+	把一下在不同场合下使用的参数单独的划分出来， 经典可以参考一下，app/__init__.py中对于配置文件的导入
+	方法。
+	
+2、	创建数据库和数据库迁移脚本方法如下，参考tags 5b
+	1、初始化：(venv)  python hello.py db init 
+	这个命令会在项目下创建 migrations 文件夹，所有迁移脚本都存放其中。
+	2、创建第一个版本：(venv) $ python hello.py db migrate -m "initial migration"  
+		检查migrations\versions，会新建一个版本.py，检查里面表格及字段
+	3、运行升级 (venv) $ python hello.py db upgrade，
+		会把项目使用的数据库文件，更新为新的表格、字段，同时保留数据
+	
+	后缀更新：
+	更新表格的字段 (models.py)
+	再次运行一下 db migrate -m -> 相当于commit 更新到/migrate目录
+	db upgrade -> 数据库会更新
+	
+3、	使用蓝图，拆分我们的路由，是结构看起来更加的清晰
+	app/main/__init__.py------->>导入蓝图
+		from flask import Blueprint
+		home = Blueprint("home",__name__)
+		#导入蓝图定义蓝图
+		import app.home.views
+	app/__init__.py----------->>注册蓝图
+		from app.home import home as home_blueprint
+		from app.admin import admin as admin_blueprint
+		
+		app.register_blueprint(home_blueprint)
+		app.register_blueprint(admin_blueprint, url_prefix="/admin")
+
+4、     主意在真实的开发环境下，我们尽量的合理拆分我们的功能模块，使我们的路由结构看起来更加的合理和美观
+	
