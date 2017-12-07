@@ -1,24 +1,12 @@
-使用flask-migrate插件，更新我们的数据库结构
-	pip install flask-migrate
-使用迁移脚本可以使我们对models文件的修改更新到我们的数据库系统中
+使用flask-mail插件，电子邮件插件
+	pip install flask-mail
 
-1、初始化：(venv)  python hello.py db init 
-	这个命令会在项目下创建 migrations 文件夹，所有迁移脚本都存放其中。
-2、创建第一个版本：(venv) $ python hello.py db migrate -m "initial migration"  
-	检查migrations\versions，会新建一个版本.py，检查里面表格及字段
-3、运行升级 (venv) $ python hello.py db upgrade，
-	会把项目使用的数据库文件，更新为新的表格、字段，同时保留数据
-
-后缀更新：
-更新表格的字段 (models.py)
-再次运行一下 db migrate -m -> 相当于commit 更新到/migrate目录
-db upgrade -> 数据库会更新
-
-当我们修改我们的数据库字段以后，我们可以使用一下的方式更新我们的数据库结构：
-直接使用如下步骤即可：
-2、创建第一个版本：(venv) $ python hello.py db migrate -m "initial migration"  
-	检查migrations\versions，会新建一个版本.py，检查里面表格及字段
-3、运行升级 (venv) $ python hello.py db upgrade，
-	会把项目使用的数据库文件，更新为新的表格、字段，同时保留数据
-
-
+	
+Flask-Mail SMTP服务器的配置
+配置默认值说明
+MAIL_SERVER 	localhost 电子邮件服务器的主机名或 IP 地址
+MAIL_PORT 25	 电子邮件服务器的端口
+MAIL_USE_TLS 	False 启用传输层安全（ Transport Layer Security， TLS）协议
+MAIL_USE_SSL 	False 启用安全套接层（ Secure Sockets Layer， SSL）协议
+MAIL_USERNAME 	None 邮件账户的用户名
+MAIL_PASSWORD 	kdNone 邮件账户的密码
