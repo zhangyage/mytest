@@ -11,31 +11,15 @@ from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager,Shell
 from flask_migrate import Migrate, MigrateCommand
-from flask_mail import Mail, Message
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.debug = True
-app.config['SECRET_KEY'] = 'hard to guess string'   #csrf密钥
-app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite:///' + os.path.join(basedir, 'data.sqlite')  #数据库文件
+app.config['SECRET_KEY'] = 'hard to guess string'
+app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['MAIL_SERVER'] = 'smtp.163.com'
-app.config['MAIL_PORT'] = 25
-# app.config['MAIL_PORT'] = 465
-# app.config['MAIL_USE_TLS'] = False
-# app.config['MAIL_USE_SSL'] = True
-#app.config['MAIL_USE_TLS'] = True
-#app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-#app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_USERNAME'] = "zhangyage2015@163.com"
-app.config['MAIL_PASSWORD'] = "@@@@@@@@"
-app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[Flasky]'   ##这个类似于主题概要的意思，但不是主题，只是在主题前面加个修饰前缀
-app.config['FLASKY_MAIL_SENDER'] = 'zhangyage2015@163.com'  ##这个是发件人，而<>前面的内容，实际上就相当于昵称的作用
-#app.config['FLASKY_ADMIN'] = os.environ.get('FLASKY_ADMIN') #这里意思是指管理员是谁，其实这个FLASKY_ADMIN随便改成什么都可以
-app.config['FLASKY_ADMIN'] = 'zhangyage2015@163.com'
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
@@ -43,7 +27,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand) 
-mail = Mail(app)
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -65,11 +48,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-def send_email(to, subject, template, **kwargs):
-    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
-    msg.body = render_template(template + '.txt', **kwargs)
-    msg.html = render_template(template + '.html', **kwargs)
-    mail.send(msg)
 
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
@@ -101,8 +79,6 @@ def index():
             db.session.add(user)
             db.session.commit()
             session['known'] = False
-            if app.config['FLASKY_ADMIN']:
-                send_email(app.config['FLASKY_ADMIN'], 'New User','mail/new_user', user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
@@ -111,5 +87,5 @@ def index():
                            known=session.get('known', False))
 
 if __name__=='__main__':  
-    #manager.run()  
-    app.run(port=int(80))
+    manager.run()  
+    #app.run(port=int(80))

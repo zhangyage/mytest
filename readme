@@ -1,12 +1,83 @@
-使用flask-mail插件，电子邮件插件
-	pip install flask-mail
+上一
+1、	config文件，记录了我们的一些配置参数，一个应该学习的地方是，使用了类，可以把一下公用的参数制定为一类
+	把一下在不同场合下使用的参数单独的划分出来， 经典可以参考一下，app/__init__.py中对于配置文件的导入
+	方法。
+	
+2、	创建数据库和数据库迁移脚本方法如下，参考tags 5b
+	1、初始化：(venv)  python manage.py db init 
+	这个命令会在项目下创建 migrations 文件夹，所有迁移脚本都存放其中。
+	2、创建第一个版本：(venv) $ python manage.py db migrate -m "initial migration"  
+		检查migrations\versions，会新建一个版本.py，检查里面表格及字段
+	3、运行升级 (venv) $ python manage.py db upgrade
+		会把项目使用的数据库文件，更新为新的表格、字段，同时保留数据
+	
+	后缀更新：
+	更新表格的字段 (models.py)
+	再次运行一下 db migrate -m -> 相当于commit 更新到/migrate目录
+	db upgrade -> 数据库会更新
+	
+3、	使用蓝图，拆分我们的路由，是结构看起来更加的清晰
+	app/main/__init__.py------->>导入蓝图
+		from flask import Blueprint
+		home = Blueprint("home",__name__)
+		#导入蓝图定义蓝图
+		import app.home.views
+	app/__init__.py----------->>注册蓝图
+		from app.home import home as home_blueprint
+		from app.admin import admin as admin_blueprint
+		
+		app.register_blueprint(home_blueprint)
+		app.register_blueprint(admin_blueprint, url_prefix="/admin")
+
+4、     主意在真实的开发环境下，我们尽量的合理拆分我们的功能模块，使我们的路由结构看起来更加的合理和美观
+
+使用flask扩展插件flask-login实现网站用户管理
+1、安装方法：
+	python -m pip install flask-login
+	
+密码认证我们使用的是Werkzeug实现的主要使用下面给的两个函数：
+	generate_password_hash(password, method=pbkdf2:sha1, salt_length=8)：这个函数将
+	原始密码作为输入，以字符串形式输出密码的散列值， 输出的值可保存在用户数据库中。
+	method 和 salt_length 的默认值就能满足大多数需求。
+	check_password_hash(hash, password)：这个函数的参数是从数据库中取回的密码散列
+	值和用户输入的密码。返回值为 True 表明密码正确。
+	
+	@property
+	def password(self):
+		raise AttributeError('password is not a readable attribute')
+	@password.setter
+	def password(self, password):    #只写  对我们的密码进行加密
+		self.password_hash = generate_password_hash(password)
+	def verify_password(self, password):  
+		return check_password_hash(self.password_hash, password)
+	
+	计算密码散列值的函数通过名为 password 的只写属性实现。设定这个属性的值时，赋值方法会调用 Werkzeug 
+	提供的 generate_password_hash() 函数，并把得到的结果赋值给	password_hash 字段。如果试图
+	读取 password 属性的值，则会返回错误，原因很明显，因为生成散列值后就无法还原成原来的密码了。
+	
+	verify_password 方 法 接 受 一 个 参 数（ 即 密 码 ）， 将 其 传 给 Werkzeug 提 供 的 check_password_hash() 
+	函数，和存储在 User 模型中的密码散列值进行比对。如果这个方法返回True，就表明密码是正确的。
+	
+2、需要再次使用蓝本定义我们的认证（auth）程序包，参考main中的定义
+	定义完成后我们需要在__init__.py中注册一下我们的蓝本
+	
+3、我们需要写我们的逻辑结构了：
+	Flask-Login中常用的实现用户认证的方法有：如下
+	is_authenticated() 如果用户已经登录，必须返回 True，否则返回 False
+	is_active() 如果允许用户登录，必须返回 True，否则返回 False。如果要禁用账户，可以返回 False
+	is_anonymous() 对普通用户必须返回 False
+	get_id() 必须返回用户的唯一标识符，使用 Unicode 编码字符
+	
+	配合UserMixin使用，具体参看以下models中数据库的定义
+	
+4、注意使用
+	flask-login的版本问题，flask-login2.x是current_user.is_authenticated(),
+	flask-login3.x是current_user.is_authenticated。
+	避免这个问题最好的办法就是使用虚拟环境并在requirement中写明版本号。
+
+	current_user.is_authenticated()基本出现在视图函数(views.py)和模板(templates)里面。
+	
+	login_required使用这个函数方法验证用户的登陆状态，进行访问权限的控制
+	
 
 	
-Flask-Mail SMTP服务器的配置
-配置默认值说明
-MAIL_SERVER 	localhost 电子邮件服务器的主机名或 IP 地址
-MAIL_PORT 25	 电子邮件服务器的端口
-MAIL_USE_TLS 	False 启用传输层安全（ Transport Layer Security， TLS）协议
-MAIL_USE_SSL 	False 启用安全套接层（ Secure Sockets Layer， SSL）协议
-MAIL_USERNAME 	None 邮件账户的用户名
-MAIL_PASSWORD 	kdNone 邮件账户的密码
