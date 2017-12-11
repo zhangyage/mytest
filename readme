@@ -88,8 +88,7 @@
 	>>> u = User(email='zhangyage2015@163.com',username='zhangyage',password='123456')
 	>>> db.session.add(u)
 	>>> db.session.commit()
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>	
-针对这个tag
+
 6、表单验证中的技巧或是注意
 	Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,'Usernames must have only letters, numbers, dots or underscores')
 	确保 username 字段只包含字母、数字、下划线和点号
@@ -99,7 +98,21 @@
 	
 	同时我们在表单验证中将email 和 username 字段定义了验证函数，确保填写的值在数据库中没出现过
 	同时使用rasie和ValidationError抛出异常
-	
+
+》》》》》》》这个tag
+7、用户注册后需要用户进行确认，但是确认的时候，我们如果直接使用固定的格式传递用户的id,那样很容易被外界猜测到，所以我们使用
+	itsdangerous 包生成包含用户 id 的安全令牌
+	可以使用如下的方式先在命令行模式下测试一下：
+	(venv) $ python manage.py shell
+	>>> from manage import app
+	>>> from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+	>>> s = Serializer(app.config['SECRET_KEY'], expires_in = 3600)
+	>>> token = s.dumps({ 'confirm': 23 })
+	>>> token
+	'eyJhbGciOiJIUzI1NiIsImV4cCI6MTM4MTcxODU1OCwiaWF0IjoxMzgxNzE0OTU4fQ.ey ...'
+	>>> data = s.loads(token)
+	>>> data
+	{u'confirm': 23}
 	
 
 	
