@@ -11,6 +11,7 @@ from app import db
 
 
 
+
 @auth.route('/login',methods=['GET','POST'])
 def login():
     form = LoginForm()
