@@ -5,8 +5,9 @@ from flask import render_template,redirect,url_for,request,flash
 from . import auth
 from flask_login import login_required,login_user,logout_user
 #login_required 相当与一个认证用户是否登陆的方法，可以通过装饰器显示用户访问权限
-from forms import LoginForm
+from forms import LoginForm,RegistrationForm
 from app.models import User
+from app import db
 
 
 
@@ -29,6 +30,21 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('main.index'))
 
+
+@auth.route('/register',methods=["POST","GET"])
+@login_required
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(
+            email=form.email.data,
+            username=form.username.data,
+            password=form.password.data
+            )
+        db.session.add(user)
+        flash('register successful!')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register.html',form=form)
 
 @auth.route('/secret')
 @login_required
