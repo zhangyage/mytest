@@ -88,6 +88,18 @@
 	>>> u = User(email='zhangyage2015@163.com',username='zhangyage',password='123456')
 	>>> db.session.add(u)
 	>>> db.session.commit()
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>	
+针对这个tag
+6、表单验证中的技巧或是注意
+	Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,'Usernames must have only letters, numbers, dots or underscores')
+	确保 username 字段只包含字母、数字、下划线和点号
+	
+	EqualTo('password2',message='Passwords must match.')
+	注册时密码需要输入两次，以确保密码正确
+	
+	同时我们在表单验证中将email 和 username 字段定义了验证函数，确保填写的值在数据库中没出现过
+	同时使用rasie和ValidationError抛出异常
+	
 	
 
 	
