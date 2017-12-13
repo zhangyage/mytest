@@ -14,3 +14,4 @@ encoding//test/test_basics.py=utf-8
 encoding/config.py=utf-8
 encoding/hello.py=utf-8
 encoding/manage.py=utf-8
+encoding/test.py=utf-8
