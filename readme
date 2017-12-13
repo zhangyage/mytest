@@ -99,7 +99,7 @@
 	同时我们在表单验证中将email 和 username 字段定义了验证函数，确保填写的值在数据库中没出现过
 	同时使用rasie和ValidationError抛出异常
 
-》》》》》》》这个tag
+
 7、用户注册后需要用户进行确认，但是确认的时候，我们如果直接使用固定的格式传递用户的id,那样很容易被外界猜测到，所以我们使用
 	itsdangerous 包生成包含用户 id 的安全令牌
 	可以使用如下的方式先在命令行模式下测试一下：
@@ -113,6 +113,17 @@
 	>>> data = s.loads(token)
 	>>> data
 	{u'confirm': 23}
+	
+	
+>>>>>>>>>>>>>>>>这个tag
+app/models.py：刷新用户的最后访问时间
+class User(UserMixin, db.Model):
+# ...
+	def ping(self):
+		self.last_seen = datetime.utcnow()
+		db.session.add(self)
+每次收到用户的请求时都要调用 ping() 方法。由于 auth 蓝本中的 before_app_request 处
+理程序会在每次请求前运行，所以能很轻松地实现这个需求
 	
 
 	
