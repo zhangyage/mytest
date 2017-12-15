@@ -40,3 +40,12 @@ nosetests.xml
 
 # Virtual environment
 venv
+
+#system file
+settings
+.settings
+*.settings
+*.project
+target
+.classpath
+.gitignore
