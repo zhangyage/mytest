@@ -111,13 +111,15 @@ class User(UserMixin, db.Model):
     def confirm(self,token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.load(token)
+            data = s.loads(token)
         except:
             return False
+            
         if data.get('confirm') != self.id:
             return False
         self.confirmed = True
         db.session.add(self)
+        db.session.commit()
         return True
     
     def ping(self):
