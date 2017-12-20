@@ -49,7 +49,7 @@ class RegistrationForm(FlaskForm):
                              EqualTo('password2',message='Passwords must match.')
                             ]
                         )
-    password = PasswordField(label="Confirm Password",
+    password2 = PasswordField(label="Confirm Password",
                              validators=[
                              Required()
                              ]
