@@ -9,7 +9,7 @@ class Config:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True    
     SQLALCHEMY_TRACK_MODIFICATIONS = True                              #设置sql自动提交
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
+    FLASKY_MAIL_SENDER = 'zhangyage2015@163.com'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN') or 'zhangyage2015@163.com'  #获取收件人
     
     @staticmethod
@@ -24,7 +24,7 @@ class DevelopmentConfig(Config):
     #MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     #MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_USERNAME = "zhangyage2015@163.com"
-    MAIL_PASSWORD = "zhang19910610"
+    MAIL_PASSWORD = "@@@@@@@@"
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
     'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
     
