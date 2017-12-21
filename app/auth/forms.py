@@ -2,10 +2,11 @@
 # -*- coding:utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField,BooleanField,PasswordField
+from wtforms import StringField,SubmitField,BooleanField,PasswordField,TextAreaField
 from wtforms.validators import Required,Length,Email, regexp, EqualTo,\
     ValidationError, DataRequired
 from app.models import User
+
 
 
 #用户登录表单
@@ -95,4 +96,6 @@ class ChangeEmailForm(FlaskForm):
 
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
-            raise ValidationError('Email already registered.')  
+            raise ValidationError('Email already registered.') 
+        
+ 
