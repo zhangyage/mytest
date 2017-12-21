@@ -84,6 +84,12 @@ def unconfirmed():
 @auth.route('/confirm')
 @login_required
 def resend_confirmation():
+    '''
+    @param:
+     current_user.email:   收件人
+     'Confirm Your Account': 主题
+     'auth/email/confirm':  使用的模板
+    '''
     token = current_user.generate_confirmation_token()
     send_email(current_user.email, 'Confirm Your Account',
                'auth/email/confirm', user=current_user, token=token)
