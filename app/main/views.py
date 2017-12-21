@@ -10,6 +10,12 @@ from . import main
 from .forms import NameForm
 
 
+#导入装饰器
+from app.decorators import admin_required,permission_required
+from app.models import Permission
+from flask_login import login_required
+
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
     form = NameForm()
@@ -37,4 +43,17 @@ def index():
         if user is None:
             abort(404)
         return render_template('user.html',user=user)
+    
+#装饰器函数测试用例
+@main.route('/admin')
+@login_required
+@admin_required
+def for_admin_only():
+    return "For Administrators!"
+
+@main.route('/moderator')
+@login_required
+@permission_required(Permission.MODERATE)
+def for_moderators_only():
+    return "For comment moderators!"
         
