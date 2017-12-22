@@ -115,7 +115,7 @@
 	{u'confirm': 23}
 	
 	
->>>>>>>>>>>>>>>>这个tag
+
 app/models.py：刷新用户的最后访问时间
 class User(UserMixin, db.Model):
 # ...
@@ -124,6 +124,11 @@ class User(UserMixin, db.Model):
 		db.session.add(self)
 每次收到用户的请求时都要调用 ping() 方法。由于 auth 蓝本中的 before_app_request 处
 理程序会在每次请求前运行，所以能很轻松地实现这个需求
+
+>>>>>>>>>>>>>>>>这个tag
+用户图像生成
+我们使用的是http://www.gravatar.com/avatar    https://secure.gravatar.com/avatar
+通过把我们的邮箱进行MD5加密得到的结果组合上面的链接就可以得到我们的随机图像
 	
 
 	
