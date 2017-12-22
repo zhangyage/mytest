@@ -93,6 +93,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())  #关于我
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)  #注册日期
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)    #最后访问日期
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
     
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -214,5 +215,14 @@ login_manager.anonymous_user = AnonymousUser
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+#文章
+class Post(db.Model):
+    __tablename__= 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)     #文章内容
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)  #创建时间
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))   #关联作者
+    
         
     
