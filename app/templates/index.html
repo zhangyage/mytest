@@ -10,4 +10,14 @@ Hello,
 {% else %}
 	Stranger
 {% endif %}
+
+<div>
+	{% if status %}
+		{{ status }}
+		{{ wtf.quick_form(form) }}
+	{% endif %}
+</div>
+
+{% include '_posts.html' %}
+
 {% endblock %}
