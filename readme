@@ -125,10 +125,18 @@ class User(UserMixin, db.Model):
 每次收到用户的请求时都要调用 ping() 方法。由于 auth 蓝本中的 before_app_request 处
 理程序会在每次请求前运行，所以能很轻松地实现这个需求
 
->>>>>>>>>>>>>>>>这个tag
+
 用户图像生成
 我们使用的是http://www.gravatar.com/avatar    https://secure.gravatar.com/avatar
 通过把我们的邮箱进行MD5加密得到的结果组合上面的链接就可以得到我们的随机图像
+
+>>>>>>>>>>>>>>>>这个tag
+我们通过forgery_py方法，在我们的数据库模块中添加了生成测试数据的方法
+下面我们通过是操作将我们的测试数据写入到我们的数据库中
+(venv) $ python manage.py shell
+>>> User.generate_fake(100)
+>>> Post.generate_fake(100)
+
 	
 
 	
