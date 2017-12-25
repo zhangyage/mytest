@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 
-from flask import render_template,url_for,redirect,session,current_app,abort
+from flask import render_template,url_for,redirect,session,current_app,abort,request
 from app import db
 from app.models import User,Role,Post,Permission
 from app.email import send_email
@@ -15,6 +15,7 @@ from app.decorators import admin_required,permission_required
 from app.models import Permission
 from flask_login import login_required,current_user
 from flask.helpers import flash
+from flask_sqlalchemy import Pagination
 
 
 
@@ -28,8 +29,14 @@ def index():
                     )
         db.session.add(post)
         return redirect(url_for('main.index'))
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template('index.html',form=form,posts=posts,status=status)
+    #分页处理
+    page = request.args.get('page',1,type=int)
+    pagination =  Post.query.order_by(Post.timestamp.desc()).paginate(
+        page,per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],error_out=False
+        )
+    posts = pagination.items    
+#     posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.html',form=form,posts=posts,status=status,pagination=pagination)
 #     form = NameForm()
 #     if form.validate_on_submit():
 #         user = User.query.filter_by(username=form.name.data).first()
