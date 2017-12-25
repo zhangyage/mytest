@@ -18,3 +18,4 @@ a1--开始学习
 10c--用户和管理员图像添加，结合http://www.gravatar.com/avatar
 11a--文章处理，文章表单/文章内容展示
 11b--使用forgery模块生成测试数据
+11c--分页，使用pagination进行分页
