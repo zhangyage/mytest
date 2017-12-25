@@ -130,12 +130,26 @@ class User(UserMixin, db.Model):
 我们使用的是http://www.gravatar.com/avatar    https://secure.gravatar.com/avatar
 通过把我们的邮箱进行MD5加密得到的结果组合上面的链接就可以得到我们的随机图像
 
->>>>>>>>>>>>>>>>这个tag
+
 我们通过forgery_py方法，在我们的数据库模块中添加了生成测试数据的方法
 下面我们通过是操作将我们的测试数据写入到我们的数据库中
 (venv) $ python manage.py shell
 >>> User.generate_fake(100)
 >>> Post.generate_fake(100)
+
+>>>>>>>>>>>>>>>>这个tag 11c
+学习使用paginate（）进行分页设设计
+属　　性    说　　明
+items 		当前页面中的记录
+query 		分页的源查询
+page 		当前页数
+prev_num 	上一页的页数
+next_num 	下一页的页数
+has_next 	如果有下一页，返回 True
+has_prev 	如果有上一页，返回 True
+pages 		查询得到的总页数
+per_page 	每页显示的记录数量
+total 		查询返回的记录总数
 
 	
 
