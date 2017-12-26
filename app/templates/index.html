@@ -4,6 +4,12 @@
 
 {% block title %}Flasky{% endblock %}
 
+<!-- 加载js Markdown 预览使用 PageDown 库生成-->
+{% block scripts %}
+	{{ super() }}
+	{{ pagedown.include_pagedown() }}
+{% endblock %}
+
 {% block page_content %}
 Hello,
 {% if current_user.is_authenticated %}
@@ -20,7 +26,8 @@ Hello,
 </div>
 
 {% include '_posts.html' %}
-<div class="pagination">
-	{{ macros.pagination_widget(pagination, '.index') }}
-</div>
+	<div class="pagination">
+		{{ macros.pagination_widget(pagination, '.index') }}
+	</div>
 {% endblock %}
+
