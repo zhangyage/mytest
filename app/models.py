@@ -80,6 +80,12 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+#用户关注关系记录表
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -96,7 +102,17 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)  #注册日期
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)    #最后访问日期
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    
+    followed = db.relationship('Follow',
+                                foreign_keys=[Follow.follower_id],
+                                backref=db.backref('follower', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
+        
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
         if self.role is None:
@@ -228,6 +244,19 @@ class User(UserMixin, db.Model):
             except IntegrityError:  #判断提交的元素数据是否重复
                 db.session.rollback()
     
+    #关注功能
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+    def is_following(self, user):
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
     
     def __repr__(self):
         return '<User %r>' % self.usernam
@@ -285,8 +314,11 @@ class Post(db.Model):
     
     def __repr__(self):
         return '<id %r>' % self.id
-    
+
+#设置一个监听函数，当每次存入文章内容时候，函数会直接将其转换为网页格式的内容    
 db.event.listen(Post.body, 'set', Post.on_changed_body)
-    
+
+
+
         
     
