@@ -137,7 +137,7 @@ class User(UserMixin, db.Model):
 >>> User.generate_fake(100)
 >>> Post.generate_fake(100)
 
->>>>>>>>>>>>>>>>这个tag 11c
+
 学习使用paginate（）进行分页设设计
 属　　性    说　　明
 items 		当前页面中的记录
@@ -151,6 +151,44 @@ pages 		查询得到的总页数
 per_page 	每页显示的记录数量
 total 		查询返回的记录总数
 
+>>>>>>>>>>>>>>>>这个tag 12a
+这张我们重点学习多对多的数据库结构设计
+我们通过学生和所选课程的关系展示一个测试用例，可以帮助我们理解，多对多关系需要借助第三张表进行关系的记录
+实例如下     主要在于  secondary
+
+registrations = db.Table('registrations',
+	db.Column('student_id', db.Integer, db.ForeignKey('students.id')),
+	db.Column('class_id', db.Integer, db.ForeignKey('classes.id'))
+	)
+class Student(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String)
+	classes = db.relationship('Class',
+	secondary=registrations,
+	backref=db.backref('students', lazy='dynamic'),
+	lazy='dynamic')
+	class Class(db.Model):
+	id = db.Column(db.Integer, primary_key = True)
+	name = db.Column(db.String)
+class Class(db.Model):
+	id = db.Column(db.Integer, primary_key = True)
+	name = db.Column(db.String)
 	
+上面的是建表语句，具体的语法参考：
+假设学生是 s，课程是 c，学
+生注册课程的代码为：
+	>>> s.classes.append(c)
+	>>> db.session.add(s)
+列出学生 s 注册的课程以及注册了课程 c 的学生也很简单：
+	>>> s.classes.all()
+	>>> c.students.all()
+Class 模型中的 students 关系由参数 db.backref() 定义。注意，这个关系中还指定了 lazy= 'dynamic' 参数，
+所以关系两侧返回的查询都可接受额外的过滤器。
+如果后来学生 s 决定不选课程 c 了，那么可使用下面的代码更新数据库：
+	>>> s.classes.remove(c)
+
+这里面有一种特殊的情况就是，我们在课程和学生之间建立关联的是两张表，但是如果我们的文章作者之间相互进行关注，他们都
+在一个表中，如果关系中的两侧都在同一个表中， 这种关系称为自引用关系
+		
 
 	
