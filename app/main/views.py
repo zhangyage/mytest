@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 
-from flask import render_template,url_for,redirect,session,current_app,abort,request
+from flask import render_template,url_for,redirect,session,current_app,abort,request,make_response
 from app import db
 from app.models import User,Role,Post,Permission
 from app.email import send_email
@@ -31,12 +31,19 @@ def index():
         return redirect(url_for('main.index'))
     #分页处理
     page = request.args.get('page',1,type=int)
-    pagination =  Post.query.order_by(Post.timestamp.desc()).paginate(
+    show_followed=False
+    if  current_user.is_authenticated:
+        show_followed = bool(request.cookies.get('show_followed', ''))
+    if show_followed:
+        query = current_user.followed_posts
+    else:
+        query = Post.query
+    pagination =  query.order_by(Post.timestamp.desc()).paginate(
         page,per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],error_out=False
         )
     posts = pagination.items    
 #     posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template('index.html',form=form,posts=posts,status=status,pagination=pagination)
+    return render_template('index.html',form=form,posts=posts,status=status,show_followed=show_followed,pagination=pagination)
 #     form = NameForm()
 #     if form.validate_on_submit():
 #         user = User.query.filter_by(username=form.name.data).first()
@@ -198,6 +205,20 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following %s anymore.' % username)
     return redirect(url_for('.user', username=username))
+
+@main.route('/all')
+@login_required
+def show_all():
+    resp = make_response(redirect(url_for('.index')))
+    resp.set_cookie('show_followed', '', max_age=30*24*60*60)
+    return resp
+
+@main.route('/followed')
+@login_required
+def show_followed():
+    resp = make_response(redirect(url_for('.index')))
+    resp.set_cookie('show_followed', '1', max_age=30*24*60*60)
+    return resp
 
     
 #装饰器函数测试用例
