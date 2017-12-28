@@ -62,8 +62,9 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
+    status = current_user.can(Permission.FOLLOW)
     posts = user.posts.order_by(Post.timestamp.desc()).all()
-    return render_template('user.html',user=user,posts=posts)
+    return render_template('user.html',user=user,posts=posts,status=status)
 
 #用户资料编辑页面
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -132,7 +133,71 @@ def edit(id):
         return redirect(url_for('main.post',id=id))
     form.body.data=post.body
     return render_template('edit_post.html',form=form) 
-       
+
+#添加关注
+@main.route('/follow/<username>')
+@login_required
+@permission_required(Permission.FOLLOW)
+def follow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('main.index'))
+    if current_user.is_following(user):
+        flash('You are already following this user.')
+        return redirect(url_for('mian.user', username=username))
+    current_user.follow(user)
+    flash('You are now following %s.' % username)
+    return redirect(url_for('main.user', username=username))
+
+#我关注的人
+@main.route('/followers/<username>')
+def followers(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    pagination = user.followers.paginate(page, 
+                                         per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+                                         error_out=False)
+    follows = [{'user': item.follower, 'timestamp': item.timestamp} for item in pagination.items]
+    return render_template('followers.html', user=user, title="Followers of",
+                           endpoint='.followers', pagination=pagination,
+                           follows=follows)
+
+#关注我的人    
+@main.route('/followed_by/<username>')
+def followed_by(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    pagination = user.followed.paginate(page, 
+                                         per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+                                         error_out=False)
+    follows = [{'user': item.follower, 'timestamp': item.timestamp} for item in pagination.items]
+    return render_template('followers.html', user=user, title="Followers of",
+                           endpoint='.followers', pagination=pagination,
+                           follows=follows)
+
+#取消关注
+@main.route('/unfollow/<username>')
+@login_required
+@permission_required(Permission.FOLLOW)
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    if not current_user.is_following(user):
+        flash('You are not following this user.')
+        return redirect(url_for('.user', username=username))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash('You are not following %s anymore.' % username)
+    return redirect(url_for('.user', username=username))
 
     
 #装饰器函数测试用例
