@@ -112,6 +112,20 @@ class User(UserMixin, db.Model):
                                 backref=db.backref('followed', lazy='joined'),
                                 lazy='dynamic',
                                 cascade='all, delete-orphan')
+    #关注功能
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+    def is_following(self, user):
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+    
         
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -120,8 +134,18 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(name='Administrator').first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
+        #调用关注函数，自我关注
+        self.follow(self)
     
-    
+    #这个是我们程序开发的时候没有考虑到自我关注也一块，后期为了补全功能添加的脚本
+    @staticmethod
+    def add_self_follows():
+        for user in User.query.all():
+            if not user.is_following(user):
+                user.follow(user)
+                db.session.add(user)
+                db.session.commit()
+        
     @property
     def password(self):
         raise AttributeError('password is not a readble attibute')
@@ -244,19 +268,7 @@ class User(UserMixin, db.Model):
             except IntegrityError:  #判断提交的元素数据是否重复
                 db.session.rollback()
     
-    #关注功能
-    def follow(self, user):
-        if not self.is_following(user):
-            f = Follow(follower=self, followed=user)
-            db.session.add(f)
-    def unfollow(self, user):
-        f = self.followed.filter_by(followed_id=user.id).first()
-        if f:
-            db.session.delete(f)
-    def is_following(self, user):
-        return self.followed.filter_by(followed_id=user.id).first() is not None
-    def is_followed_by(self, user):
-        return self.followers.filter_by(follower_id=user.id).first() is not None
+    
     
     
     #连表查询，获取关注用户的文章   集合view中的
