@@ -4,10 +4,10 @@
 
 from flask import render_template,url_for,redirect,session,current_app,abort,request,make_response
 from app import db
-from app.models import User,Role,Post,Permission
+from app.models import User,Role,Post,Permission,Comment
 from app.email import send_email
 from . import main
-from .forms import NameForm,EditProfileForm,EditProfileAdminForm,PostForm
+from .forms import NameForm,EditProfileForm,EditProfileAdminForm,PostForm,CommentForm
 
 
 #导入装饰器
@@ -119,10 +119,29 @@ def edit_profile_admin(id):
 
 
 #文章单页显示
-@main.route('/post/<int:id>')
+@main.route('/post/<int:id>',methods=['GET', 'POST'])
 def post(id):
     post = Post.query.get_or_404(id)
-    return render_template('post.html',posts=[post])
+    form = CommentForm()
+    status = current_user.can(Permission.COMMENT)
+    if form.validate_on_submit():
+        comment = Comment(body=form.body.data,
+                          post=post,
+                          author = current_user._get_current_object()
+                        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been published.')  
+        return redirect(url_for('.post', id=post.id, page=-1) )  
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = (post.comments.count() - 1) / \
+                current_app.config['FLASKY_COMMENTS_PER_PAGE'] + 1
+    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
+                                        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+                                        error_out=False)
+    comments = pagination.items
+    return render_template('post.html',posts=[post], form=form,comments=comments, pagination=pagination,status=status)
 
 
 #页面编辑
