@@ -23,7 +23,9 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
-                
+                {% if  True %} <!-- 此处有个bug就是只有当有修改评论权限的用户才可以看到这个导航，由于报错直接True -->
+					<li><a href="{{ url_for('main.moderate') }}">Moderate Comments</a></li>
+				{% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
 				{% if current_user.is_authenticated %}
