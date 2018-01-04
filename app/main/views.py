@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*-
 
 
-from flask import render_template,url_for,redirect,session,current_app,abort,request,make_response
+from flask import render_template,url_for,redirect,session,current_app,abort,request,make_response,flash
 from app import db
-from app.models import User,Role,Post,Permission,Comment
+from app.models import Permission,User,Role,Post,Comment
 from app.email import send_email
 from . import main
 from .forms import NameForm,EditProfileForm,EditProfileAdminForm,PostForm,CommentForm
@@ -12,9 +12,7 @@ from .forms import NameForm,EditProfileForm,EditProfileAdminForm,PostForm,Commen
 
 #导入装饰器
 from app.decorators import admin_required,permission_required
-from app.models import Permission
 from flask_login import login_required,current_user
-from flask.helpers import flash
 from flask_sqlalchemy import Pagination
 
 
@@ -239,6 +237,38 @@ def show_followed():
     resp.set_cookie('show_followed', '1', max_age=30*24*60*60)
     return resp
 
+#评论管理模块
+@main.route('/moderate')
+@login_required
+@permission_required(Permission.MODERATE)
+def moderate():
+    page = request.args.get('page', 1, type=int)
+    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
+    comments = pagination.items
+    return render_template('moderate.html', comments=comments,pagination=pagination, page=page)
+
+@main.route('/moderate/enable/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE)
+def moderate_enable(id):
+    comment = Comment.query.get_or_404(id)
+    comment.disabled = False
+    db.session.add(comment)
+    return redirect(url_for('.moderate',
+                            page=request.args.get('page', 1, type=int)))
+
+
+@main.route('/moderate/disable/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE)
+def moderate_disable(id):
+    comment = Comment.query.get_or_404(id)
+    comment.disabled = True
+    db.session.add(comment)
+    return redirect(url_for('.moderate',
+                            page=request.args.get('page', 1, type=int)))
+    
     
 #装饰器函数测试用例
 @main.route('/admin')
