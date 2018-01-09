@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from app import db
+from flask import url_for
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
 from . import login_manager
@@ -277,6 +278,33 @@ class User(UserMixin, db.Model):
         return Post.query.join(Follow, Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
     
     
+    #api使用  密令生成，减少密码传递提升安全
+    def generate_auth_token(self,expiration):
+        s = Serializer(current_app.config['SECRET_KEY'],expiration)
+        return s.dumps({'confirm':self.id})
+    
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.load(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+    
+    #josn字串API使用
+    def to_json(self):
+        json_user = {
+                        'url': url_for('api.get_post', id=self.id, _external=True),
+                        'username': self.username,
+                        'member_since': self.member_since,
+                        'last_seen': self.last_seen,
+                        'posts': url_for('api.get_user_posts', id=self.id, _external=True),
+                        'followed_posts': url_for('api.get_user_followed_posts',id=self.id, _external=True),
+                        'post_count': self.posts.count()
+                    }
+        return json_user
+    
     def __repr__(self):
         return '<User %r>' % self.usernam
     
@@ -331,6 +359,19 @@ class Post(db.Model):
         target.body_html = bleach.linkify(bleach.clean(
                                             markdown(value, output_format='html'),
                                             tags=allowed_tags, strip=True))
+        
+    
+    #josn格式化方法
+    def to_json(self):
+        json_post={'url':url_for('api.get_post', id=self.id, _external=True),
+                   'body':self.body,
+                   'body_html' : self.body_html,
+                   'timestamp' : self.timestamp,
+                   'author': url_for('api.get_user', id=self.author_id,_external=True),
+                   'comments': url_for('api.get_post_comments', id=self.id,_external=True),
+                   'comment_count': self.comments.count()             
+            }
+        return json_post
         
     
     def __repr__(self):
