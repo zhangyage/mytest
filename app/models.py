@@ -364,6 +364,7 @@ class Post(db.Model):
     #josn格式化方法
     def to_json(self):
         json_post={'url':url_for('api.get_post', id=self.id, _external=True),
+                   
                    'body':self.body,
                    'body_html' : self.body_html,
                    'timestamp' : self.timestamp,
