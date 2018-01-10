@@ -12,6 +12,7 @@ from datetime import datetime
 import hashlib
 from markdown import markdown
 import bleach
+from app.exceptions import ValidationError
 
 
 
@@ -364,7 +365,6 @@ class Post(db.Model):
     #josn格式化方法
     def to_json(self):
         json_post={'url':url_for('api.get_post', id=self.id, _external=True),
-                   
                    'body':self.body,
                    'body_html' : self.body_html,
                    'timestamp' : self.timestamp,
@@ -373,6 +373,13 @@ class Post(db.Model):
                    'comment_count': self.comments.count()             
             }
         return json_post
+    
+    @staticmethod
+    def from_json(json_post):
+        body = json_post.get('body')
+        if body is None or body == '':
+            raise ValidationError('Post does not have a body')
+        return Post(body=body)
         
     
     def __repr__(self):
