@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from flask import Flask,render_template
+from flask import Flask,render_template,request,jsonify
 from . import main
 
 # @main.app_errorhandler(404)
